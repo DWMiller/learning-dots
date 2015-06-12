@@ -3,6 +3,6 @@ let config = {
     w: 0,
     obstacleCount: 1000,
     cellSize: 1,
-    droneCount: 1,
-    scale: 10
+    droneCount: 25,
+    scale: 7
 };

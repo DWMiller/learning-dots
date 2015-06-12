@@ -97,7 +97,6 @@ function simulate() {
 
         if (!drone.isFree(obstaclesLookup)) {
             allowedMoves[tempX][tempY][drone.direction] = false;
-            drone.color = '#00FF00';
             drone.destroyed = true;
             needsCleanup = true;
         }
