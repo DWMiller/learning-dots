@@ -1,40 +1,28 @@
 let movement = stampit({
-    moves: ['up', 'right', 'down', 'left'],
-    direction: false,
-    pickDirection: function() {
-        this.direction = util.arrayRand(this.moves);
-    },
-    isFree: function(lookup) {
-        if (!lookup.hasOwnProperty(this.x)) {
-            return true;
-        }
+        move: function() {
+            this.x += 1*this.vector.x;
+            this.y += 1*this.vector.y;
+        },
+        rotate: {
+            left: function(self) {
+                self.vector.rotateDeg(-90);
+                self.vector.x = self.vector.x.toFixed(0);
+                self.vector.y = self.vector.y.toFixed(0);
+            },
+            right: function(self) {
+                self.vector.rotateDeg(90);
+                self.vector.x = self.vector.x.toFixed(0);
+                self.vector.y = self.vector.y.toFixed(0);
+            },
+            straight: function() {
 
-        if (!lookup[this.x].hasOwnProperty(this.y)) {
-            return true;
-        }
-
-        return false;
-    },
-    move: {
-        left: function(obj) {
-            if (obj.x > 0) {
-                obj.x--;
-            }
-        },
-        up: function(obj) {
-            if (obj.y > 0) {
-                obj.y--;
-            }
-        },
-        right: function(obj) {
-            if (obj.x < config.w) {
-                obj.x++;
-            }
-        },
-        down: function(obj) {
-            if (obj.y < config.h) {
-                obj.y++;
             }
         }
+    }, {
+        //state
+        energy: config.droneEnergy,
+        vector: Victor(1, 0)
     }
-});
+
+    //enclosed
+);
