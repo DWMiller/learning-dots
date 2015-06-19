@@ -56,14 +56,27 @@ let util = {
         return (c);
     },
     arrayRand: function(arr) {
-        var index = Math.floor(Math.random() * arr.length);
+        var index = util.arrayRandIndex(arr);
         return arr[index];
+    },
+    arrayRandIndex: function(arr) {
+        var index = Math.floor(Math.random() * arr.length);
+        return index;
     },
     deepCopy: function(obj) {
         return JSON.parse(JSON.stringify(obj));
     },
+    arrayCopy: function(arr) {
+        return arr.slice();
+    },
     arrayRemove: function(array, index) {
         array.splice(index, 1);
         return array;
+    },
+    repeater: function(fn, ms) {
+        fn();
+        setTimeout(function() {
+            util.repeater(fn, ms);
+        }, ms)
     }
 };

@@ -22,27 +22,25 @@ function checkDeathConditions(drone) {
 }
 
 function seedEnergy() {
-    coordUtil.each(energyMap, function(x, y) {
+    coordUtil.each(energyMap, function enerySeed(x, y) {
         if (energyMap[x][y] < config.energyMax) {
             energyMap[x][y] += config.energyRate;
         }
     })
 }
 
+function updateAverage() {
+    averageAge = calcAverage(entities.drones, 'age');
+}
 
 function spawnGeneration(drones) {
     let newDrones = [];
 
-    let eligibleDrones = drones.filter(function(drone) {
-        // Get only the drones capable of spawning new drones
-        return drone.energy > config.spawnThreshold;
-    })
+    let eligibleDrones = filterSpawnEligibleDrones(drones)
 
     eligibleDrones.forEach(function spawn(drone) {
-        //drone has double energy, spawn child wave
         drone.energy -= config.droneEnergy;
         let newDrone = createDrone(drone.x, drone.y);
-        newDrone.complexity = drone.complexity;
         newDrone.generation = drone.generation + 1;
 
         if (newDrone.generation > generationCounter) {
@@ -77,6 +75,13 @@ function deathCheck(drones) {
 function filterDeadDrones(drones) {
     return drones.filter(function filterDestroyed(drone) {
         return !drone.destroyed;
+    })
+}
+
+function filterSpawnEligibleDrones(drones) {
+    return drones.filter(function eligibleDronesFilter(drone) {
+        // Get only the drones capable of spawning new drones
+        return drone.energy > config.spawnThreshold;
     })
 }
 

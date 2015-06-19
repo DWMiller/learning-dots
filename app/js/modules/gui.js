@@ -26,8 +26,9 @@ function setupGui() {
     let statsFolder = gui.addFolder('Stats');
     statsFolder.add(window, 'generationCounter').name('Generations').listen();
     statsFolder.add(window, 'droneCounter').name('Active Drones').listen();
+    statsFolder.add(window, 'averageAge').name('Avg. Drone Age').listen();
     statsFolder.open();
 
-    gui.add(window, 'start');
+    gui.add(window, 'start').name('Restart');
 
 }

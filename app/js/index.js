@@ -25,27 +25,7 @@ function simulate() {
 
     let newDrones = spawnGeneration(entities.drones);
 
-    entities.drones.forEach(function movement(drone, index) {
-
-        let choice = drone.lookup(drone.x, drone.y);
-
-        if (!choice) {
-            choice = drone.mutate(drone.x, drone.y);
-        }
-
-        let availableEnergy = energyMap[drone.x][drone.y];
-        energyMap[drone.x][drone.y] = 0;
-        drone.energy += (availableEnergy - config.droneEnergyRate);
-
-        drone.rotate[choice](drone);
-
-        let oldX = drone.x,
-            oldY = drone.y;
-        drone.move();
-        repositionInLookupTable(drone, oldX, oldY);
-
-        drone.age++;
-    });
+    entities.drones.forEach(move);
 
     if (newDrones.length > 0) {
         newDrones.forEach(pushToLookupTable);
@@ -57,6 +37,24 @@ function simulate() {
     render();
     requestAnimationFrame(simulate);
 }
+
+function move(drone, index) {
+    let choice = drone.nextDecision();
+
+    let availableEnergy = energyMap[drone.x][drone.y];
+    energyMap[drone.x][drone.y] = 0;
+    drone.energy += (availableEnergy - config.droneEnergyRate);
+
+    drone.rotate[choice](drone);
+
+    let oldX = drone.x,
+        oldY = drone.y;
+    drone.move();
+    repositionInLookupTable(drone, oldX, oldY);
+
+    drone.age++;
+}
+
 
 function start() {
     entities = {};
@@ -70,8 +68,8 @@ function start() {
 
     lookupTable = generateLookupTable(config.w, config.h);
 
-        entities.obstacles = generateObstacles();
-    
+    entities.obstacles = generateObstacles();
+
 
     energyMap = generateEnergyMap();
     entities.drones = [].concat(generateDrones());
@@ -92,10 +90,15 @@ let canvas = document.getElementById("canvas"),
     energyMap, lookupTable;
 
 let generationCounter = 0,
-    droneCounter = 0;
+    droneCounter = 0,
+    averageAge = 0;
 
 let droneStamp = stampit.compose(particle, drone, mind, movement);
 
 setupGui();
 
 start();
+
+// repeaters.average();
+
+util.repeater(updateAverage, 1000);

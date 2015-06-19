@@ -1,20 +1,20 @@
 let movement = stampit({
         move: function() {
-            this.x += 1*this.vector.x;
-            this.y += 1*this.vector.y;
+            this.x += 1 * this.vector.x;
+            this.y += 1 * this.vector.y;
         },
         rotate: {
-            left: function(self) {
+            turnLeft: function(self) {
                 self.vector.rotateDeg(-90);
                 self.vector.x = self.vector.x.toFixed(0);
                 self.vector.y = self.vector.y.toFixed(0);
             },
-            right: function(self) {
+            turnRight: function(self) {
                 self.vector.rotateDeg(90);
                 self.vector.x = self.vector.x.toFixed(0);
                 self.vector.y = self.vector.y.toFixed(0);
             },
-            straight: function() {
+            nothing: function() {
 
             }
         }
