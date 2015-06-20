@@ -1,9 +1,15 @@
-function calcAverage(drones, field) {
+function calcAverage(objArr, field) {
     let sum = 0;
 
-    drones.forEach(function(drone) {
+    objArr.forEach(function(drone) {
         sum += drone[field];
     })
 
-    return sum / drones.length;
+    return sum / objArr.length;
+}
+
+function calcHighest(objArr, field) {
+    return Math.max.apply(Math, objArr.map(function(o) {
+        return o[field];
+    }));
 }

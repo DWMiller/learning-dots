@@ -30,29 +30,11 @@ function seedEnergy() {
 }
 
 function updateAverage() {
-    averageAge = calcAverage(entities.drones, 'age');
+    stats.averageAge = calcAverage(entities.drones, 'age');
 }
 
-function spawnGeneration(drones) {
-    let newDrones = [];
-
-    let eligibleDrones = filterSpawnEligibleDrones(drones)
-
-    eligibleDrones.forEach(function spawn(drone) {
-        drone.energy -= config.droneEnergy;
-        let newDrone = createDrone(drone.x, drone.y);
-        newDrone.generation = drone.generation + 1;
-
-        if (newDrone.generation > generationCounter) {
-            generationCounter++;
-        }
-
-        newDrone.color = util.rainbow(config.colorSteps, newDrone.generation % config.colorSteps)
-        newDrone.evolve(drone.map);
-        newDrones.push(newDrone);
-    });
-
-    return newDrones;
+function updateHighest() {
+    stats.highestAge = calcHighest(entities.drones, 'age');
 }
 
 function deathCheck(drones) {
@@ -72,22 +54,32 @@ function deathCheck(drones) {
     return needsCleanup;
 }
 
-function filterDeadDrones(drones) {
-    return drones.filter(function filterDestroyed(drone) {
-        return !drone.destroyed;
-    })
-}
-
-function filterSpawnEligibleDrones(drones) {
-    return drones.filter(function eligibleDronesFilter(drone) {
-        // Get only the drones capable of spawning new drones
-        return drone.energy > config.spawnThreshold;
-    })
-}
 
 function droneCollisionCheck(drone) {
+    if (drone.destroyed) {
+        return;
+    }
+
     let collisions = lookupAtLocation(drone.x, drone.y, 'drone'); //includes self
+
     if (collisions.length > 1) {
-        util.arrayRand(collisions).destroyed = true;
+
+        let highest = 0,
+            lowest = 0;
+
+        for (let i = 0; i < collisions.length; i++) {
+            if (collisions[i].age > collisions[highest].age) {
+                highest = i;
+            }
+
+            if (collisions[i].age < collisions[lowest].age) {
+                lowest = i;
+            }
+        };
+
+
+        collisions[lowest].destroyed = true;
+        collisions[highest].energy += collisions[lowest].energy;
+
     }
 }

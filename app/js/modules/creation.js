@@ -23,7 +23,6 @@ function generateEnergyMap() {
         if (!energyMap.hasOwnProperty(x)) {
             energyMap[x] = {};
         }
-        energyMap[x] = {};
         for (let y = 0; y <= config.h; y++) {
             energyMap[x][y] = config.energyMax;
         }
@@ -41,6 +40,28 @@ function generateDrones() {
     };
 
     return arr;
+}
+
+function spawnGeneration(drones) {
+    let newDrones = [];
+
+    let eligibleDrones = filterSpawnEligibleDrones(drones)
+
+    eligibleDrones.forEach(function spawn(drone) {
+        drone.energy -= config.droneEnergy;
+        let newDrone = createDrone(drone.x, drone.y);
+        newDrone.generation = drone.generation + 1;
+
+        if (newDrone.generation > stats.generationCounter) {
+            stats.generationCounter++;
+        }
+
+        newDrone.color = util.rainbow(config.colorSteps, newDrone.generation % config.colorSteps)
+        newDrone.evolve(drone.map);
+        newDrones.push(newDrone);
+    });
+
+    return newDrones;
 }
 
 function createDrone(x, y) {

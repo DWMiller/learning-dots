@@ -32,7 +32,7 @@ function simulate() {
         entities.drones = entities.drones.concat(newDrones);
     }
 
-    droneCounter = entities.drones.length;
+    stats.droneCounter = entities.drones.length;
 
     render();
     requestAnimationFrame(simulate);
@@ -64,7 +64,7 @@ function start() {
 
     config.obstacleCount = Math.floor(config.w * config.h * config.obstacleDensity);
 
-    generationCounter = 0;
+    stats.generationCounter = 0;
 
     lookupTable = generateLookupTable(config.w, config.h);
 
@@ -89,9 +89,12 @@ let canvas = document.getElementById("canvas"),
     entities,
     energyMap, lookupTable;
 
-let generationCounter = 0,
-    droneCounter = 0,
-    averageAge = 0;
+let stats = {
+    generationCounter: 0,
+    droneCounter: 0,
+    averageAge: 0,
+    highestAge: 0,
+};
 
 let droneStamp = stampit.compose(particle, drone, mind, movement);
 
@@ -102,3 +105,4 @@ start();
 // repeaters.average();
 
 util.repeater(updateAverage, 1000);
+util.repeater(updateHighest, 500);
