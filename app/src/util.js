@@ -1,23 +1,19 @@
+import aRandomColor from 'randomcolor';
+
 module.exports = {
-    randomColor: function() {
-        // let letters = '0123456789ABCDEF'.split('');
-        // let color = '#';
-        // for (var i = 0; i < 6; i++) {
-        //     color += letters[Math.floor(Math.random() * 16)];
-        // }
-        // return color;
-        return randomColor({
-            luminosity: 'bright'
-        });
-    },
-    randCoord: function(maxX, maxY) {
-        return {
-            x: Math.floor(Math.random() * maxX),
-            y: Math.floor(Math.random() * maxY)
-        }
-    },
-    arrayRand: function(arr) {
-        var index = Math.floor(Math.random() * arr.length);
-        return arr[index];
-    }
+  randomColor() {
+    return aRandomColor({
+      luminosity: 'bright',
+    });
+  },
+  randCoord({ w, h, scale }) {
+    return {
+      x: Math.floor(Math.random() * (w / scale)) * scale,
+      y: Math.floor(Math.random() * (h / scale)) * scale,
+    };
+  },
+  arrayRand(arr) {
+    const index = Math.floor(Math.random() * arr.length);
+    return arr[index];
+  },
 };

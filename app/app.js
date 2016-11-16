@@ -1,161 +1,138 @@
-require('./css/styles.css')
-
 import config from './src/config';
 import canvasUtil from './src/canvas_util';
-import movement from './src/movement';
-import particle from './src/particle';
+
+import obstacle from './src/obstacle/obstacle';
+import spawnStamp from './src/spawner/spawner';
+
+
 import util from './src/util';
 
+require('./css/styles.css');
+
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+const state = {
+  spawner: null,
+  obstacles: [],
+  drones: [],
+};
+
+let obstaclesLookup;
+let allowedMoves;
+
 function generateMoveMap() {
-    allowedMoves = {};
-    for (let x = 0; x <= config.w; x++) {
-        allowedMoves[x] = {};
-        for (let y = 0; y <= config.h; y++) {
-            allowedMoves[x][y] = {
-                up: true,
-                right: true,
-                down: true,
-                left: true
-            };
-        }
+  allowedMoves = {};
+  for (let x = 0; x <= config.w; x += 1) {
+    allowedMoves[x] = {};
+    for (let y = 0; y <= config.h; y += 1) {
+      allowedMoves[x][y] = {
+        up: true,
+        right: true,
+        down: true,
+        left: true,
+      };
     }
+  }
 }
 
-function generateObstacles() {
-    let arr = [];
-    let stamp = stampit.compose(particle);
+function generateObstacles(count) {
+  const obstacles = [];
 
-    obstaclesLookup = {};
+  obstaclesLookup = {};
 
-    for (var i = 0; i < config.obstacleCount; i++) {
-        let pos = util.randCoord(config.w, config.h);
+  for (let i = 0; i < count; i += 1) {
+    const newObstacle = obstacle(util.randCoord(config));
 
-        let obstacle = stamp.create({
-            x: pos.x,
-            y: pos.y,
-            color: '#FF0000'
-        })
+    obstacles.push(newObstacle);
 
-        arr.push(obstacle);
+    if (!Object.hasOwnProperty.call(obstaclesLookup, newObstacle.x)) {
+      obstaclesLookup[newObstacle.x] = {};
+    }
 
-        if (!obstaclesLookup.hasOwnProperty(obstacle.x)) {
-            obstaclesLookup[obstacle.x] = {};
-        }
+    obstaclesLookup[newObstacle.x][newObstacle.y] = newObstacle;
+  }
 
-        obstaclesLookup[obstacle.x][obstacle.y] = obstacle;
-    };
-
-    return arr;
+  return obstacles;
 }
 
 function generateDrones() {
-    let stamp = stampit.compose(particle, movement);
+  while (state.drones.length < config.droneCount) {
+    state.drones.push(state.spawner.spawn());
+  }
 
-    while (drones.length < config.droneCount) {
-        let pos = util.randCoord(config.w, config.h);
-
-        drones.push(stamp.create({
-            x: pos.x,
-            y: pos.y,
-            color: util.randomColor()
-        }));
-    };
-
-    return drones;
+  return state.drones;
 }
 
 function render() {
-    canvasUtil.blurClear(ctx);
+  canvasUtil.blurClear(ctx);
 
-    obstacles.forEach(function(obstacle) {
-        obstacle.draw(ctx);
-    });
+  state.obstacles.forEach((obj) => {
+    obj.draw(ctx, config);
+  });
 
-    drones.forEach(function(drone) {
-        drone.draw(ctx);
-    });
+  state.drones.forEach((obj) => {
+    obj.draw(ctx, config);
+  });
+
+  state.spawner.draw(ctx, config);
 }
 
 function startSimulation() {
-    requestAnimationFrame(simulate);
+  requestAnimationFrame(simulate);
 }
 
 function simulate() {
+  if (state.drones.length === 0) {
+    state.drones = generateDrones();
+  }
 
-    if (drones.length < config.droneCount) {
-        drones = generateDrones();
+  let needsCleanup = false;
+  state.drones.forEach((drone) => {
+    if (!drone.direction || drone.x < config.scale || drone.y < config.scale ||
+      drone.x >= config.w - config.scale || drone.y >= config.h - config.scale ||
+      Math.round(Math.random() * 10) === 5) {
+      drone.pickDirection();
     }
 
-    let needsCleanup = false;
-    drones.forEach(function(drone, index) {
 
-        if (!drone.direction || drone.x < 1 || drone.y < 1 || drone.x >= config.w || drone.y >= config.h) {
-            drone.pickDirection();
-        }
-
-        if (!allowedMoves[drone.x][drone.y][drone.direction]) {
-            drone.pickDirection();
-            return;
-        }
-
-        let tempX = drone.x,
-            tempY = drone.y;
-
-        drone.move[drone.direction](drone);
-
-        if (!drone.isFree(obstaclesLookup)) {
-            allowedMoves[tempX][tempY][drone.direction] = false;
-            drone.destroyed = true;
-            needsCleanup = true;
-        }
-    });
-
-    if (needsCleanup) {
-        drones = drones.filter(function(drone) {
-            return !drone.destroyed;
-        })
+    if (!allowedMoves[drone.x][drone.y][drone.direction]) {
+      drone.pickDirection();
+      return;
     }
 
-    render();
-    requestAnimationFrame(simulate);
+    const previousX = drone.x;
+    const previousY = drone.y;
+
+    drone.move[drone.direction](drone, config);
+
+    if (!drone.isFree(obstaclesLookup)) {
+      allowedMoves[previousX][previousY][drone.direction] = false;
+      drone.setDestroyed();
+      needsCleanup = true;
+    }
+  });
+
+  if (needsCleanup) {
+    state.drones = state.drones.filter(drone => !drone.destroyed);
+  }
+
+  render();
+  requestAnimationFrame(simulate);
 }
 
-function start() {
-    config.h = Math.floor(document.body.clientHeight / config.scale);
-    config.w = Math.floor(document.body.clientWidth / config.scale);
+config.h = Math.floor(document.body.clientHeight);// / config.scale);
+config.w = Math.floor(document.body.clientWidth);// / config.scale);
 
-    canvas.width = config.w;
-    canvas.height = config.h;
+canvas.width = config.w;
+canvas.height = config.h;
 
-    obstacles = generateObstacles();
-    generateMoveMap();
+const obstacleCount = Math.floor(((config.w * config.h) / (config.scale * config.scale)) * config.obstacleDensity);
 
-    if (!started) {
-        startSimulation();
-    }
+state.spawner = spawnStamp(util.randCoord(config));
 
-    started = true;
-}
+state.obstacles = generateObstacles(obstacleCount);
 
-let canvas = document.getElementById("canvas"),
-    ctx = canvas.getContext('2d'),
-    started = false,
-    obstacles, obstaclesLookup, drones = [],
-    allowedMoves;
+generateMoveMap();
 
-start();
-
-// var gui = new dat.GUI({
-//     autoPlace: false
-// });
-
-// var customContainer = document.getElementById('gui');
-// customContainer.appendChild(gui.domElement);
-
-// gui.add(config, 'addTarget');
-// gui.add(config, 'removeTarget');
-// gui.add(config, 'moreLines');
-// gui.add(config, 'lessLines');
-// gui.add(config, 'lineWidth').min(1).step(1);
-// gui.add(config, 'movingLines');
-// gui.add(config, 'movingTargets');
+startSimulation();
