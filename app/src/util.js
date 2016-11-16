@@ -1,4 +1,4 @@
-let util = {
+module.exports = {
     randomColor: function() {
         // let letters = '0123456789ABCDEF'.split('');
         // let color = '#';

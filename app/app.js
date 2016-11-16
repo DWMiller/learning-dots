@@ -1,3 +1,11 @@
+require('./css/styles.css')
+
+import config from './src/config';
+import canvasUtil from './src/canvas_util';
+import movement from './src/movement';
+import particle from './src/particle';
+import util from './src/util';
+
 function generateMoveMap() {
     allowedMoves = {};
     for (let x = 0; x <= config.w; x++) {

@@ -1,4 +1,4 @@
-let config = {
+module.exports = {
     h: 0,
     w: 0,
     obstacleCount: 1000,

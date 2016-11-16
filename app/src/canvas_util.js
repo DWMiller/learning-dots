@@ -1,4 +1,4 @@
-let canvasUtil = {
+module.exports = {
     clear: function(ctx) {
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     },

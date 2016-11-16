@@ -1,4 +1,7 @@
-let movement = stampit({
+import config from './config';
+import util from './util';
+
+module.exports = stampit({
     moves: ['up', 'right', 'down', 'left'],
     direction: false,
     pickDirection: function() {

@@ -1,4 +1,6 @@
-let particle = stampit({
+import config from './config';
+
+module.exports = stampit({
     x: 0,
     y: 0,
     color: '#000',
