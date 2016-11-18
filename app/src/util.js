@@ -1,3 +1,5 @@
+/* eslint-disable no-param-reassign*/
+
 import aRandomColor from 'randomcolor';
 
 module.exports = {

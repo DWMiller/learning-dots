@@ -91,7 +91,7 @@ function simulate() {
   state.drones.forEach((drone) => {
     if (!drone.direction || drone.x < config.scale || drone.y < config.scale ||
       drone.x >= config.w - config.scale || drone.y >= config.h - config.scale ||
-      Math.round(Math.random() * 10) === 5) {
+      Math.round(Math.random() * 15) === 5) {
       drone.pickDirection();
     }
 
@@ -124,8 +124,8 @@ function simulate() {
 config.h = Math.floor(document.body.clientHeight);// / config.scale);
 config.w = Math.floor(document.body.clientWidth);// / config.scale);
 
-canvas.width = config.w;
-canvas.height = config.h;
+canvasUtil.setCanvasSize(ctx, config);
+canvasUtil.fillBackground(ctx, 'rgba(22, 31, 40,1)');
 
 const obstacleCount = Math.floor(((config.w * config.h) / (config.scale * config.scale)) * config.obstacleDensity);
 

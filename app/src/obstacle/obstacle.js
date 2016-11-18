@@ -5,5 +5,5 @@ module.exports = stampit()
 .compose(particle)
 .props({
   type: 'obstacle',
-  color: '#2A2A2A',
+  color: '#d35400',
 });
