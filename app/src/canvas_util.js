@@ -4,7 +4,7 @@ module.exports = {
   },
   blurClear(ctx) {
     const originalColour = ctx.fillStyle;
-    ctx.fillStyle = 'rgba(22, 31, 40,0.05)';
+    ctx.fillStyle = 'rgba(11, 16, 20,0.05)';
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     ctx.fillStyle = originalColour;
   },
